@@ -41,6 +41,16 @@ public class BatteryTile extends QuickSettingsTile implements BatteryStateChange
                 startSettingsActivity(Intent.ACTION_POWER_USAGE_SUMMARY);
             }
         };
+        qsc.registerObservedContent(Settings.System.getUriFor(
+                Settings.System.STATUS_BAR_BATTERY), this);
+        qsc.registerObservedContent(Settings.System.getUriFor(
+                Settings.System.STATUS_BAR_BATTERY_COLOR), this);
+        qsc.registerObservedContent(Settings.System.getUriFor(
+                Settings.System.STATUS_BAR_BATTERY_TEXT_COLOR), this);
+        qsc.registerObservedContent(Settings.System.getUriFor(
+                Settings.System.STATUS_BAR_BATTERY_TEXT_CHARGING_COLOR), this);
+        qsc.registerObservedContent(Settings.System.getUriFor(
+                Settings.System.STATUS_BAR_CIRCLE_BATTERY_ANIMATIONSPEED), this);
     }
 
     @Override
@@ -57,6 +67,21 @@ public class BatteryTile extends QuickSettingsTile implements BatteryStateChange
     }
 
     @Override
+    public void onChangeUri(ContentResolver resolver, Uri uri) {
+        BatteryMeterView battery =
+                (BatteryMeterView) mTile.findViewById(R.id.image);
+        BatteryCircleMeterView circleBattery =
+                (BatteryCircleMeterView) mTile.findViewById(R.id.circle_battery);
+        if (circleBattery != null) {
+            circleBattery.updateSettings();
+        }
+        if (battery != null) {
+            battery.updateSettings();
+        }
+        updateResources();
+    }
+
+    @Override
     public void onBatteryLevelChanged(int level, boolean pluggedIn) {
         mBatteryLevel = level;
         mPluggedIn = pluggedIn;
@@ -70,10 +95,16 @@ public class BatteryTile extends QuickSettingsTile implements BatteryStateChange
     }
 
     private synchronized void updateTile() {
+        int batteryStyle = Settings.System.getIntForUser(mContext.getContentResolver(),
+            Settings.System.STATUS_BAR_BATTERY, 0, UserHandle.USER_CURRENT);
+        boolean batteryHasPercent = batteryStyle == BatteryMeterView.BATTERY_STYLE_ICON_PERCENT
+            || batteryStyle == BatteryMeterView.BATTERY_STYLE_PERCENT
+            || batteryStyle == BatteryMeterView.BATTERY_STYLE_CIRCLE_PERCENT
+            || batteryStyle == BatteryMeterView.BATTERY_STYLE_DOTTED_CIRCLE_PERCENT;
         if (mBatteryLevel == 100) {
             mLabel = mContext.getString(R.string.quick_settings_battery_charged_label);
         } else {
-            if (!mBatteryHasPercent) {
+            if (!batteryHasPercent) {
                 mLabel = mPluggedIn
                     ? mContext.getString(R.string.quick_settings_battery_charging_label,
                             mBatteryLevel)
@@ -87,27 +118,8 @@ public class BatteryTile extends QuickSettingsTile implements BatteryStateChange
         }
     }
 
-    public void updateBattery() {
-        if (mBattery == null || mCircleBattery == null) {
-            return;
-        }
-        mCircleBattery.updateSettings();
-        mBattery.updateSettings();
-        int batteryStyle = Settings.System.getIntForUser(mContext.getContentResolver(),
-            Settings.System.STATUS_BAR_BATTERY, 0, UserHandle.USER_CURRENT);
-        mBatteryHasPercent = batteryStyle == BatteryMeterView.BATTERY_STYLE_ICON_PERCENT
-            || batteryStyle == BatteryMeterView.BATTERY_STYLE_PERCENT
-            || batteryStyle == BatteryMeterView.BATTERY_STYLE_CIRCLE_PERCENT
-            || batteryStyle == BatteryMeterView.BATTERY_STYLE_DOTTED_CIRCLE_PERCENT;
-    }
-
     @Override
     void updateQuickSettings() {
-        mBattery = (BatteryMeterView) mTile.findViewById(R.id.image);
-        mBattery.setVisibility(View.GONE);
-        mCircleBattery = (BatteryCircleMeterView) mTile.findViewById(R.id.circle_battery);
-        updateBattery();
-
         TextView tv = (TextView) mTile.findViewById(R.id.text);
         tv.setText(mLabel);
     }

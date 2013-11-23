@@ -3168,6 +3168,12 @@ public final class Settings {
         public static final String CLEAR_RECENTS_BUTTON = "clear_recents_button";
 
         /**
+         * Screenshot toggle delay
+         * @hide
+         */
+        public static final String SCREENSHOT_TOGGLE_DELAY = "screenshot_toggle_delay";
+
+        /**
          * Enable Stylus Gestures
          *
          * @hide
