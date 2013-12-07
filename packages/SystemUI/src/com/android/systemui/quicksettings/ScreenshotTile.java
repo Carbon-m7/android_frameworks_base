@@ -49,7 +49,6 @@ public class ScreenshotTile extends QuickSettingsTile {
         mOnLongClick = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                qsc.mBar.collapseAllPanels(true);
                 int delay = Settings.System.getInt(mContext.getContentResolver(),
                         Settings.System.SCREENSHOT_TOGGLE_DELAY, 5000);
                 final Toast toast = Toast.makeText(mContext,

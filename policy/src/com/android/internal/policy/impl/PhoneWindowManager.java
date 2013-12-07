@@ -546,40 +546,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private final SparseArray<KeyCharacterMap.FallbackAction> mFallbackActions =
             new SparseArray<KeyCharacterMap.FallbackAction>();
 
-    private static final int MSG_ENABLE_POINTER_LOCATION = 1;
-    private static final int MSG_DISABLE_POINTER_LOCATION = 2;
-    private static final int MSG_DISPATCH_MEDIA_KEY_WITH_WAKE_LOCK = 3;
-    private static final int MSG_DISPATCH_MEDIA_KEY_REPEAT_WITH_WAKE_LOCK = 4;
-    private static final int MSG_DISPATCH_VOLKEY_WITH_WAKE_LOCK = 5;
-
-    private class PolicyHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_ENABLE_POINTER_LOCATION:
-                    enablePointerLocation();
-                    break;
-                case MSG_DISABLE_POINTER_LOCATION:
-                    disablePointerLocation();
-                    break;
-                case MSG_DISPATCH_MEDIA_KEY_WITH_WAKE_LOCK:
-                    dispatchMediaKeyWithWakeLock((KeyEvent)msg.obj);
-                    break;
-                case MSG_DISPATCH_MEDIA_KEY_REPEAT_WITH_WAKE_LOCK:
-                    dispatchMediaKeyRepeatWithWakeLock((KeyEvent)msg.obj);
-                    break;
-                case MSG_DISPATCH_VOLKEY_WITH_WAKE_LOCK:
-                    mIsLongPress = true;
-                    dispatchMediaKeyWithWakeLockToAudioService((KeyEvent)msg.obj);
-                    dispatchMediaKeyWithWakeLockToAudioService(KeyEvent.changeAction((KeyEvent)msg.obj, KeyEvent.ACTION_UP));
-                    break;
-            }
-        }
-    }
-
     private SettingsReceiver mSettingsReceiver;
 
-    class SettingsReceiver extends SettingsReceiver {
+    private class SettingsReceiver extends BroadcastReceiver {
         private boolean mIsRegistered = false;
 
         public SettingsReceiver(Context context) {
@@ -608,6 +577,37 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (mIsRegistered) {
                 mIsRegistered = false;
                 mContext.unregisterReceiver(this);
+            }
+        }
+    }
+
+    private static final int MSG_ENABLE_POINTER_LOCATION = 1;
+    private static final int MSG_DISABLE_POINTER_LOCATION = 2;
+    private static final int MSG_DISPATCH_MEDIA_KEY_WITH_WAKE_LOCK = 3;
+    private static final int MSG_DISPATCH_MEDIA_KEY_REPEAT_WITH_WAKE_LOCK = 4;
+    private static final int MSG_DISPATCH_VOLKEY_WITH_WAKE_LOCK = 5;
+
+    private class PolicyHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_ENABLE_POINTER_LOCATION:
+                    enablePointerLocation();
+                    break;
+                case MSG_DISABLE_POINTER_LOCATION:
+                    disablePointerLocation();
+                    break;
+                case MSG_DISPATCH_MEDIA_KEY_WITH_WAKE_LOCK:
+                    dispatchMediaKeyWithWakeLock((KeyEvent)msg.obj);
+                    break;
+                case MSG_DISPATCH_MEDIA_KEY_REPEAT_WITH_WAKE_LOCK:
+                    dispatchMediaKeyRepeatWithWakeLock((KeyEvent)msg.obj);
+                    break;
+                case MSG_DISPATCH_VOLKEY_WITH_WAKE_LOCK:
+                    mIsLongPress = true;
+                    dispatchMediaKeyWithWakeLockToAudioService((KeyEvent)msg.obj);
+                    dispatchMediaKeyWithWakeLockToAudioService(KeyEvent.changeAction((KeyEvent)msg.obj, KeyEvent.ACTION_UP));
+                    break;
             }
         }
     }

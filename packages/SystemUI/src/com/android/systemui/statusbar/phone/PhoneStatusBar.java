@@ -303,7 +303,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
 
     DisplayMetrics mDisplayMetrics = new DisplayMetrics();
 
-    BatteryTile mQSB;
     private BatteryMeterView mBattery;
     private BatteryCircleMeterView mCircleBattery;
 
@@ -399,9 +398,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
     }
 
     private void updateBatteryIcons() {
-        if (mQSB != null) {
-            mQSB.updateBattery();
-        }
         if (mBattery != null && mCircleBattery != null) {
             mBattery.updateSettings();
             mCircleBattery.updateSettings();

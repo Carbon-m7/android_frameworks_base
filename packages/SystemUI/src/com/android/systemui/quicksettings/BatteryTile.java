@@ -1,9 +1,12 @@
 package com.android.systemui.quicksettings;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.BatteryManager;
+import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.view.LayoutInflater;

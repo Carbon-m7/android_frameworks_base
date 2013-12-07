@@ -18,27 +18,21 @@ package com.android.systemui.statusbar.phone;
 
 import android.animation.TimeInterpolator;
 import android.app.ActivityManager;
-<<<<<<< HEAD
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.os.SystemClock;
-=======
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.res.Resources;
-import android.database.ContentObserver;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.Settings;
->>>>>>> 50021dd... System bar color WIP
 import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -65,10 +59,6 @@ public class BarTransitions {
     private final BarBackgroundDrawable mBarBackground;
 
     private int mMode;
-
-    private boolean mCustomColor;
-    private int opaqueColor;
-//    private int transColor;
 
     Handler mHandler;
 
@@ -144,20 +134,14 @@ public class BarTransitions {
             final Resources res = context.getResources();
             final ContentResolver resolver = context.getContentResolver();
 
-            mCustomColor = Settings.System.getInt(resolver,
-                    Settings.System.CUSTOM_STATUS_BAR_COLOR, 0) == 1;
-            opaqueColor = Settings.System.getInt(resolver,
-                    Settings.System.STATUS_BAR_OPAQUE_COLOR, 0xff000000);
-//          transColor = Settings.System.getInt(resolver,
-//                  Settings.System.STATUS_BAR_SEMI_TRANS_COLOR, 0x66000000);
-
             if (DEBUG_COLORS) {
                 mOpaque = 0xff0000ff;
                 mSemiTransparent = 0x7f0000ff;
             } else {
-                if (mCustomColor) {
-                    mOpaque = opaqueColor;
-                    mSemiTransparent = 0x7f0000ff;
+                if (Settings.System.getInt(resolver,
+                            Settings.System.CUSTOM_STATUS_BAR_COLOR, 0) == 1) {
+                    mOpaque = Settings.System.getInt(resolver,
+                                    Settings.System.STATUS_BAR_OPAQUE_COLOR, 0xff000000);
                 } else {
                     mOpaque = res.getColor(R.color.system_bar_background_opaque);
                 }

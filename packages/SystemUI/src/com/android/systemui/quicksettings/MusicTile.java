@@ -27,6 +27,7 @@ import android.media.MediaMetadataEditor;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
 import android.media.RemoteController;
+import android.os.Handler;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemClock;
@@ -36,6 +37,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsContainerView;
@@ -55,7 +57,7 @@ public class MusicTile extends QuickSettingsTile {
 
     public MusicTile(Context context,
             QuickSettingsController qsc, Handler handler) {
-        super(context, qsc);
+        super(context, qsc, R.layout.quick_settings_tile_music);
 
         mRemoteController = new RemoteController(context, mRCClientUpdateListener);
         AudioManager manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
@@ -91,18 +93,6 @@ public class MusicTile extends QuickSettingsTile {
     }
 
     private synchronized void updateTile() {
-        final ImageView background =
-                (ImageView) mTile.findViewById(R.id.background);
-        if (background != null) {
-            if (mMetadata.bitmap != null) {
-                background.setImageDrawable(new BitmapDrawable(mMetadata.bitmap));
-                background.setColorFilter(
-                    Color.rgb(123, 123, 123), android.graphics.PorterDuff.Mode.MULTIPLY);
-            } else {
-                background.setImageDrawable(null);
-                background.setColorFilter(null);
-            }
-        }
         if (mActive) {
             mDrawable = R.drawable.ic_qs_media_pause;
             mLabel = mMetadata.trackTitle != null
@@ -111,6 +101,25 @@ public class MusicTile extends QuickSettingsTile {
             mDrawable = R.drawable.ic_qs_media_play;
             mLabel = mContext.getString(R.string.quick_settings_music_play);
         }
+    }
+
+    @Override
+    void updateQuickSettings() {
+        ImageView bg = (ImageView) mTile.findViewById(R.id.background);
+        if (bg != null) {
+            if (mMetadata.bitmap != null) {
+                bg.setImageDrawable(new BitmapDrawable(mMetadata.bitmap));
+                bg.setColorFilter(
+                    Color.rgb(123, 123, 123), android.graphics.PorterDuff.Mode.MULTIPLY);
+            } else {
+                bg.setImageDrawable(null);
+                bg.setColorFilter(null);
+            }
+        }
+        ImageView iv = (ImageView) mTile.findViewById(R.id.image);
+        iv.setImageResource(mDrawable);
+        TextView tv = (TextView) mTile.findViewById(R.id.text);
+        tv.setText(mLabel);
     }
 
     private void playbackStateUpdate(int state) {
